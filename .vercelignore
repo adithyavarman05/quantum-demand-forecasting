@@ -1,5 +1,9 @@
 requirements.txt
-*.py
 artifacts.joblib
 venv/
 archive/
+generate_documents.py
+quantum_demand_forecasting.py
+streamlit_app.py
+expanded_ops.json
+tape_ops.json
