@@ -1,0 +1,9 @@
+pennylane
+numpy
+pandas
+scikit-learn
+matplotlib
+joblib
+streamlit
+python-pptx
+python-docx
