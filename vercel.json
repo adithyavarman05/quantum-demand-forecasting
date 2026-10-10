@@ -1,6 +1,12 @@
 {
   "version": 2,
   "name": "quantum-demand-forecasting",
+  "builds": [
+    {
+      "src": "index.html",
+      "use": "@vercel/static"
+    }
+  ],
   "cleanUrls": true,
   "trailingSlash": false
 }
