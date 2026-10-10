@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quantum AI Electricity Demand Forecasting</title>
+  <meta name="description" content="Hybrid Variational Quantum Circuit (VQC) vs Linear Regression for Electricity Demand Forecasting by Adithya Varman Nandhivarman">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #0b091a 0%, #171333 40%, #1f1b40 70%, #0d0a21 100%);
+      --card-bg: rgba(255, 255, 255, 0.05);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --card-hover: rgba(255, 255, 255, 0.09);
+      --accent-purple: #7952e0;
+      --accent-cyan: #38bdf8;
+      --accent-teal: #2dd4bf;
+      --accent-pink: #f43f5e;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --font-main: 'Outfit', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      min-height: 100vh;
+      color: var(--text-main);
+      font-family: var(--font-main);
+      padding: 2rem 1rem 4rem 1rem;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1160px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(121, 82, 224, 0.2);
+      border: 1px solid rgba(121, 82, 224, 0.4);
+      color: #c4b5fd;
+      padding: 0.35rem 1rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      margin-bottom: 1rem;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: #34d399;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #34d399;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 20%, #c4b5fd 60%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.6rem;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    .author-tag {
+      margin-top: 0.5rem;
+      font-size: 0.95rem;
+      color: #a78bfa;
+      font-weight: 500;
+    }
+
+    /* Tabs */
+    .tabs-nav {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      background: rgba(15, 12, 38, 0.6);
+      padding: 0.4rem;
+      border-radius: 16px;
+      border: 1px solid var(--card-border);
+      max-width: 680px;
+      margin: 0 auto 2.5rem auto;
+      backdrop-filter: blur(10px);
+    }
+
+    .tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: var(--font-main);
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 20px rgba(99, 102, 241, 0.35);
+    }
+
+    /* Content Cards */
+    .tab-pane {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 2rem;
+      backdrop-filter: blur(14px);
+      margin-bottom: 1.5rem;
+      transition: border-color 0.2s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(255, 255, 255, 0.18);
+    }
+
+    .card-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .card-desc {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 1.8rem;
+    }
+
+    /* Grid for Inputs */
+    .inputs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .input-box {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 1.1rem;
+      transition: all 0.2s;
+    }
+
+    .input-box:focus-within {
+      border-color: #a78bfa;
+      box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.18);
+    }
+
+    .input-label {
+      display: flex;
+      justify-content: space-between;
+      color: #c4b5fd;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+
+    .input-label span {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+    }
+
+    .number-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: #ffffff;
+      font-family: var(--font-mono);
+      font-size: 1.25rem;
+      font-weight: 600;
+      outline: none;
+    }
+
+    .range-slider {
+      width: 100%;
+      margin-top: 0.6rem;
+      accent-color: #8b5cf6;
+      cursor: pointer;
+    }
+
+    .btn-predict {
+      width: 100%;
+      background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+      color: #ffffff;
+      border: none;
+      font-family: var(--font-main);
+      font-size: 1.1rem;
+      font-weight: 700;
+      padding: 1rem 2rem;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      box-shadow: 0 8px 25px rgba(124, 58, 237, 0.35);
+    }
+
+    .btn-predict:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(124, 58, 237, 0.45);
+    }
+
+    .btn-predict:active {
+      transform: translateY(0);
+    }
+
+    /* Output Predictions */
+    .prediction-results {
+      margin-top: 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .pred-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 1.8rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pred-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+    }
+
+    .pred-card.quantum::before {
+      background: linear-gradient(90deg, #8b5cf6, #38bdf8);
+    }
+
+    .pred-card.linear::before {
+      background: linear-gradient(90deg, #ec4899, #f43f5e);
+    }
+
+    .pred-tag {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .pred-value {
+      font-family: var(--font-mono);
+      font-size: 2.3rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .pred-card.quantum .pred-value {
+      background: linear-gradient(90deg, #a78bfa, #38bdf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .pred-card.linear .pred-value {
+      background: linear-gradient(90deg, #f472b6, #fb7185);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .pred-delta {
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+
+    /* Table Styles */
+    .table-container {
+      overflow-x: auto;
+      margin: 1.5rem 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+
+    th {
+      background: rgba(255, 255, 255, 0.06);
+      padding: 1rem 1.2rem;
+      color: #c4b5fd;
+      font-weight: 600;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    td {
+      padding: 1rem 1.2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-family: var(--font-mono);
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .highlight-best {
+      color: #34d399;
+      font-weight: 600;
+    }
+
+    /* Images & Figures */
+    .figure-box {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.2rem;
+      margin-top: 1.5rem;
+      text-align: center;
+    }
+
+    .figure-box img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .figure-caption {
+      margin-top: 0.8rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Doc downloads */
+    .doc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .doc-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.2s;
+    }
+
+    .doc-card:hover {
+      border-color: #8b5cf6;
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .doc-icon {
+      font-size: 2rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .doc-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+
+    .doc-desc {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .btn-download {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background: rgba(139, 92, 246, 0.15);
+      border: 1px solid rgba(139, 92, 246, 0.4);
+      color: #c4b5fd;
+      text-decoration: none;
+      padding: 0.65rem 1rem;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    .btn-download:hover {
+      background: #8b5cf6;
+      color: #ffffff;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      margin-top: 4rem;
+      color: #64748b;
+      font-size: 0.85rem;
+    }
+
+    footer a {
+      color: #a78bfa;
+      text-decoration: none;
+    }
+
+    @media (max-width: 640px) {
+      h1 { font-size: 2rem; }
+      .card { padding: 1.4rem; }
+      .inputs-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="badge-pill">
+        <span class="pulse-dot"></span>
+        <span>PennyLane • Variational Quantum Circuit (VQC)</span>
+      </div>
+      <h1>⚡ Quantum AI Electricity Demand Forecasting</h1>
+      <p class="subtitle">
+        Hybrid 4-Qubit Variational Quantum Regressor with Strongly Entangling Layers vs. Classical Baseline
+      </p>
+      <p class="author-tag">Capstone Project • Student: Adithya Varman Nandhivarman</p>
+    </header>
+
+    <!-- Tabs Navigation -->
+    <nav class="tabs-nav">
+      <button class="tab-btn active" onclick="switchTab('predict')">🔮 Predict</button>
+      <button class="tab-btn" onclick="switchTab('results')">📊 Model Results</button>
+      <button class="tab-btn" onclick="switchTab('circuit')">🔬 Quantum Circuit</button>
+      <button class="tab-btn" onclick="switchTab('docs')">📄 Documents</button>
+    </nav>
+
+    <!-- TAB 1: PREDICT -->
+    <div id="pane-predict" class="tab-pane active">
+      <div class="card">
+        <div class="card-title">⚡ Interactive Forecasting Engine</div>
+        <p class="card-desc">
+          Enter the historical electricity demand from the previous 4 consecutive hours (MW). The quantum circuit evaluates the 4-qubit statevector in real-time to forecast hour t.
+        </p>
+
+        <div class="inputs-grid">
+          <div class="input-box">
+            <div class="input-label">
+              <span>LAG t−4</span>
+              <span>4 Hours Ago</span>
+            </div>
+            <input type="number" id="in-0" class="number-input" value="18225.0" step="50" oninput="syncFromNum(0)">
+            <input type="range" id="rng-0" class="range-slider" min="10000" max="20000" step="10" value="18225" oninput="syncFromRng(0)">
+          </div>
+
+          <div class="input-box">
+            <div class="input-label">
+              <span>LAG t−3</span>
+              <span>3 Hours Ago</span>
+            </div>
+            <input type="number" id="in-1" class="number-input" value="17885.0" step="50" oninput="syncFromNum(1)">
+            <input type="range" id="rng-1" class="range-slider" min="10000" max="20000" step="10" value="17885" oninput="syncFromRng(1)">
+          </div>
+
+          <div class="input-box">
+            <div class="input-label">
+              <span>LAG t−2</span>
+              <span>2 Hours Ago</span>
+            </div>
+            <input type="number" id="in-2" class="number-input" value="17258.0" step="50" oninput="syncFromNum(2)">
+            <input type="range" id="rng-2" class="range-slider" min="10000" max="20000" step="10" value="17258" oninput="syncFromRng(2)">
+          </div>
+
+          <div class="input-box">
+            <div class="input-label">
+              <span>LAG t−1</span>
+              <span>1 Hour Ago</span>
+            </div>
+            <input type="number" id="in-3" class="number-input" value="16796.0" step="50" oninput="syncFromNum(3)">
+            <input type="range" id="rng-3" class="range-slider" min="10000" max="20000" step="10" value="16796" oninput="syncFromRng(3)">
+          </div>
+        </div>
+
+        <button class="btn-predict" onclick="calculateForecast()">
+          <span>⚡ Execute Quantum Inference</span>
+        </button>
+
+        <div class="prediction-results">
+          <div class="pred-card quantum">
+            <div class="pred-tag">⚛️ VQC (4-Qubit Variational Quantum)</div>
+            <div id="vqc-pred-val" class="pred-value">14,730.40 MW</div>
+            <div class="pred-delta">Expectation Value ⟨Z₀⟩: <span id="vqc-z0-val" style="color:#c4b5fd;">0.1313</span></div>
+          </div>
+
+          <div class="pred-card linear">
+            <div class="pred-tag">📐 Classical Linear Regression Baseline</div>
+            <div id="lr-pred-val" class="pred-value">16,347.35 MW</div>
+            <div class="pred-delta">4 Features + Intercept Fit</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: RESULTS -->
+    <div id="pane-results" class="tab-pane">
+      <div class="card">
+        <div class="card-title">📊 Benchmark & Performance Comparison</div>
+        <p class="card-desc">
+          Rigorous quantitative comparison of the Variational Quantum Circuit against classical linear regression on the AEP hourly electricity demand dataset.
+        </p>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Evaluation Metric</th>
+                <th>VQC (Quantum)</th>
+                <th>Linear Regression</th>
+                <th>Advantage / Note</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>MAE (Mean Absolute Error)</td>
+                <td>696.9230 MW</td>
+                <td class="highlight-best">226.1469 MW</td>
+                <td>Linear captures near-linear 1-hour auto-correlation</td>
+              </tr>
+              <tr>
+                <td>RMSE (Root Mean Square Error)</td>
+                <td>1,092.7620 MW</td>
+                <td class="highlight-best">309.4397 MW</td>
+                <td>Evaluation on 300 test holdout hours</td>
+              </tr>
+              <tr>
+                <td>R² (Coefficient of Determination)</td>
+                <td>0.6224</td>
+                <td class="highlight-best">0.9697</td>
+                <td>VQC demonstrates non-linear quantum phase representation</td>
+              </tr>
+              <tr>
+                <td>Training Execution Time</td>
+                <td>2.15 seconds</td>
+                <td class="highlight-best">0.0038 seconds</td>
+                <td>80 Adam optimization epochs vs OLS closed-form</td>
+              </tr>
+              <tr>
+                <td>Trainable Parameters</td>
+                <td>24 parameters</td>
+                <td>5 parameters</td>
+                <td>2 layers × 4 qubits × 3 rotations (Rot gates)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="figure-box">
+          <img src="results_plots.png" alt="Actual vs Predicted Demand, Loss Curve, and Model Comparison" loading="lazy">
+          <div class="figure-caption">Figure 1: Actual vs Predicted Demand (VQC), VQC Training Loss Convergence (MSE), and Dual-Model Trajectory Comparison</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: CIRCUIT -->
+    <div id="pane-circuit" class="tab-pane">
+      <div class="card">
+        <div class="card-title">🔬 Quantum Circuit Architecture</div>
+        <p class="card-desc">
+          Mathematical formulation and quantum gate layout designed with PennyLane.
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+          <div style="background: rgba(0,0,0,0.25); padding: 1.2rem; border-radius: 14px; border: 1px solid var(--card-border);">
+            <div style="color: #a78bfa; font-weight: 700; margin-bottom: 0.3rem;">Qubits</div>
+            <div style="font-size: 1.4rem; font-family: var(--font-mono); font-weight: 700;">4 Qubits</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">One wire dedicated per hourly lag feature (t-4 ... t-1)</div>
+          </div>
+          <div style="background: rgba(0,0,0,0.25); padding: 1.2rem; border-radius: 14px; border: 1px solid var(--card-border);">
+            <div style="color: #a78bfa; font-weight: 700; margin-bottom: 0.3rem;">Feature Encoding</div>
+            <div style="font-size: 1.4rem; font-family: var(--font-mono); font-weight: 700;">AngleEmbedding</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">RX rotation with rotation angle θ = π × x_norm</div>
+          </div>
+          <div style="background: rgba(0,0,0,0.25); padding: 1.2rem; border-radius: 14px; border: 1px solid var(--card-border);">
+            <div style="color: #a78bfa; font-weight: 700; margin-bottom: 0.3rem;">Ansatz</div>
+            <div style="font-size: 1.4rem; font-family: var(--font-mono); font-weight: 700;">StronglyEntangling</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">2 layers of arbitrary single-qubit Rot gates + cyclic CNOTs</div>
+          </div>
+          <div style="background: rgba(0,0,0,0.25); padding: 1.2rem; border-radius: 14px; border: 1px solid var(--card-border);">
+            <div style="color: #a78bfa; font-weight: 700; margin-bottom: 0.3rem;">Measurement</div>
+            <div style="font-size: 1.4rem; font-family: var(--font-mono); font-weight: 700;">PauliZ(0)</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Expectation value ⟨Z₀⟩ ∈ [-1, +1] mapped to MW</div>
+          </div>
+        </div>
+
+        <div class="figure-box">
+          <img src="quantum_circuit.png" alt="PennyLane 4-Qubit Variational Quantum Circuit Diagram" loading="lazy">
+          <div class="figure-caption">Figure 2: Compiled Quantum Circuit: AngleEmbedding + 2 Layers of StronglyEntanglingLayers with Rot(φ, θ, ω) and CNOT Entanglement</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: DOCUMENTS -->
+    <div id="pane-docs" class="tab-pane">
+      <div class="card">
+        <div class="card-title">📄 Project Deliverables & Reports</div>
+        <p class="card-desc">
+          Official Capstone Report, Presentation Deck, and Documentation files for academic evaluation.
+        </p>
+
+        <div class="doc-grid">
+          <div class="doc-card">
+            <div>
+              <div class="doc-icon">📊</div>
+              <div class="doc-title">Capstone Presentation (.pptx)</div>
+              <div class="doc-desc">Complete presentation slides covering problem definition, quantum circuit mathematics, training methodology, and empirical comparison.</div>
+            </div>
+            <a href="Capstone_PPT.pptx" download class="btn-download">⬇️ Download Capstone_PPT.pptx</a>
+          </div>
+
+          <div class="doc-card">
+            <div>
+              <div class="doc-icon">📝</div>
+              <div class="doc-title">Comprehensive Capstone Report (.docx)</div>
+              <div class="doc-desc">Detailed academic report containing IEEE style figures, methodology, mathematical formulations, and evaluation results.</div>
+            </div>
+            <a href="Capstone_Report.docx" download class="btn-download">⬇️ Download Capstone_Report.docx</a>
+          </div>
+
+          <div class="doc-card">
+            <div>
+              <div class="doc-icon">💻</div>
+              <div class="doc-title">Source Code on GitHub</div>
+              <div class="doc-desc">Public GitHub repository with PennyLane model scripts, dataset preprocessing, and Streamlit app.</div>
+            </div>
+            <a href="https://github.com/adithyavarman05/quantum-demand-forecasting" target="_blank" rel="noopener" class="btn-download">🌐 View GitHub Repository</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      Quantum AI Electricity Demand Forecasting • Built with PennyLane & Deployed on Vercel
+    </footer>
+  </div>
+
+  <script>
+    // Tab switching
+    function switchTab(name) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+      document.getElementById('pane-' + name).classList.add('active');
+    }
+
+    // Model artifacts
+    const MODEL = {
+      x_scaler_min: [10263.0, 10263.0, 10263.0, 10263.0],
+      x_scaler_max: [18161.0, 18161.0, 18161.0, 18161.0],
+      y_scaler_min: 10263.0,
+      y_scaler_max: 18161.0,
+      lr_coef: [-0.2264065934173131, 1.009555276133037, -2.849471405299632, 3.9144036812423035],
+      lr_intercept: -0.9213363191370689,
+      weights: [
+        [
+          [1.1200592042082562, 5.305752315400839, 3.750120143099663],
+          [3.5401769618462997, 0.1059138771764484, 2.88554589006017],
+          [2.9084165157650097, 1.5354751684749717, 4.546977499697998],
+          [-0.12785143426747164, 4.645117963585105, 6.257191994633647]
+        ],
+        [
+          [0.00489312981772048, 6.234249091048671, 3.8797507484781946],
+          [3.843130152333974, 0.04439890396499865, 0.14490549149075685],
+          [3.7383177965292735, 1.8887534975598277, 0.2932090085787196],
+          [6.118286368405992, 1.4625454654104555, 0.5692970188143646]
+        ]
+      ]
+    };
+
+    // 4-Qubit Exact Statevector Simulator
+    function simulateVQC(x_scaled, weights) {
+      const N = 4, dim = 16;
+      let re = new Float64Array(dim), im = new Float64Array(dim);
+      re[0] = 1.0;
+
+      function apply1Q(wire, u00_r, u00_i, u01_r, u01_i, u10_r, u10_i, u11_r, u11_i) {
+        const bit = 3 - wire;
+        const step = 1 << bit;
+        const next_re = new Float64Array(dim), next_im = new Float64Array(dim);
+
+        for (let i = 0; i < dim; i++) {
+          if ((i & step) === 0) {
+            const j = i | step;
+            const r0 = re[i], i0 = im[i];
+            const r1 = re[j], i1 = im[j];
+
+            next_re[i] = (u00_r * r0 - u00_i * i0) + (u01_r * r1 - u01_i * i1);
+            next_im[i] = (u00_r * i0 + u00_i * r0) + (u01_r * i1 + u01_i * r1);
+
+            next_re[j] = (u10_r * r0 - u10_i * i0) + (u11_r * r1 - u11_i * i1);
+            next_im[j] = (u10_r * i0 + u10_i * r0) + (u11_r * i1 + u11_i * r1);
+          }
+        }
+        re = next_re; im = next_im;
+      }
+
+      function applyRX(wire, theta) {
+        const c = Math.cos(theta / 2), s = Math.sin(theta / 2);
+        apply1Q(wire, c, 0, 0, -s, 0, -s, c, 0);
+      }
+
+      function applyRot(wire, phi, theta, omega) {
+        const ct = Math.cos(theta / 2), st = Math.sin(theta / 2);
+        const c_sum = Math.cos((omega + phi) / 2), s_sum = Math.sin((omega + phi) / 2);
+        const c_diff = Math.cos((omega - phi) / 2), s_diff = Math.sin((omega - phi) / 2);
+
+        const m00_r = ct * c_sum,  m00_i = -ct * s_sum;
+        const m01_r = -st * c_diff, m01_i = st * s_diff;
+        const m10_r = st * c_diff,  m10_i = st * s_diff;
+        const m11_r = ct * c_sum,  m11_i = ct * s_sum;
+
+        apply1Q(wire, m00_r, m00_i, m01_r, m01_i, m10_r, m10_i, m11_r, m11_i);
+      }
+
+      function applyCNOT(ctrl, tgt) {
+        const bit_c = 3 - ctrl, bit_t = 3 - tgt;
+        const mask_c = 1 << bit_c, mask_t = 1 << bit_t;
+        const next_re = new Float64Array(re), next_im = new Float64Array(im);
+
+        for (let i = 0; i < dim; i++) {
+          if ((i & mask_c) !== 0 && (i & mask_t) === 0) {
+            const j = i | mask_t;
+            next_re[i] = re[j]; next_im[i] = im[j];
+            next_re[j] = re[i]; next_im[j] = im[i];
+          }
+        }
+        re = next_re; im = next_im;
+      }
+
+      // 1. AngleEmbedding
+      for (let i = 0; i < N; i++) {
+        applyRX(i, Math.PI * x_scaled[i]);
+      }
+
+      // 2. StronglyEntanglingLayers
+      for (let l = 0; l < weights.length; l++) {
+        for (let i = 0; i < N; i++) {
+          const [phi, theta, omega] = weights[l][i];
+          applyRot(i, phi, theta, omega);
+        }
+        const r = (l % (N - 1)) + 1;
+        for (let i = 0; i < N; i++) {
+          applyCNOT(i, (i + r) % N);
+        }
+      }
+
+      // 3. Measurement: <Z0>
+      const mask0 = 1 << 3;
+      let expval = 0;
+      for (let i = 0; i < dim; i++) {
+        const prob = re[i] * re[i] + im[i] * im[i];
+        expval += (i & mask0) === 0 ? prob : -prob;
+      }
+      return expval;
+    }
+
+    function syncFromNum(idx) {
+      const val = document.getElementById('in-' + idx).value;
+      document.getElementById('rng-' + idx).value = val;
+      calculateForecast();
+    }
+
+    function syncFromRng(idx) {
+      const val = document.getElementById('rng-' + idx).value;
+      document.getElementById('in-' + idx).value = parseFloat(val).toFixed(1);
+      calculateForecast();
+    }
+
+    function calculateForecast() {
+      const vals = [
+        parseFloat(document.getElementById('in-0').value) || 0,
+        parseFloat(document.getElementById('in-1').value) || 0,
+        parseFloat(document.getElementById('in-2').value) || 0,
+        parseFloat(document.getElementById('in-3').value) || 0,
+      ];
+
+      // MinMax scale to [0, 1]
+      const x_scaled = vals.map((v, i) => {
+        const min = MODEL.x_scaler_min[i];
+        const max = MODEL.x_scaler_max[i];
+        const s = (v - min) / (max - min);
+        return Math.max(0, Math.min(1, s));
+      });
+
+      // Quantum inference
+      const z0 = simulateVQC(x_scaled, MODEL.weights);
+      const y_min = MODEL.y_scaler_min;
+      const y_max = MODEL.y_scaler_max;
+      const pred_q = y_min + ((z0 + 1) / 2) * (y_max - y_min);
+
+      // Linear regression inference
+      let lr_val = MODEL.lr_intercept;
+      for (let i = 0; i < 4; i++) {
+        lr_val += MODEL.lr_coef[i] * x_scaled[i];
+      }
+      const pred_l = y_min + ((lr_val + 1) / 2) * (y_max - y_min);
+
+      // Render
+      document.getElementById('vqc-pred-val').textContent = pred_q.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' MW';
+      document.getElementById('vqc-z0-val').textContent = z0.toFixed(4);
+      document.getElementById('lr-pred-val').textContent = pred_l.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' MW';
+    }
+
+    // Initialize on load
+    window.addEventListener('DOMContentLoaded', calculateForecast);
+  </script>
+</body>
+</html>
